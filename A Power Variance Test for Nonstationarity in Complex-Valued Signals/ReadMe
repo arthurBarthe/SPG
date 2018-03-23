@@ -1,0 +1,14 @@
+by Thomas E. Bartlett, Adam M. Sykulski, Sofia C. Olhede, Jonathan M. Lilly and Jeffrey J. Early (2015) 
+
+email: thomas.bartlett.10@ucl.ac.uk with queries
+
+All code is in Matlab, and all downloads are zip files.
+
+SPVNT.zip
+  - code to perform a power variance test on any complex-valued signal
+
+Figs156.zip
+  - code to exactly replicate Figures 1, 5 and 6
+
+Figs234.zip
+  - code to exactly replicate Figures 2, 3 and 4
