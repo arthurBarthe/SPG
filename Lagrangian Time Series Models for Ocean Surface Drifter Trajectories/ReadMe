@@ -6,12 +6,18 @@ email: a.sykulski@lancaster.ac.uk with queries
 
 All code is in Matlab, and all downloads are zip files. Each zip file has a ReadMe with important info
 
-Click here for a simple routine to fit a Matern + complex OU process to any complex-valued time series (also includes code for simulating any Matern + complex OU time series)
+MaternOUexample.zip 
+  - provides a simple routine to fit a Matern + complex OU process to any complex-valued time series
+  - includes code for simulating any Matern + complex OU time series
 
-Click here for analysis code of Drifter ID #44000 to produce Figures 1, 2 and 4
+Figs124.zip
+  - analysis code of Drifter ID #44000 to produce Figures 1, 2 and 4
 
-Click here for code for the comparison of fractional Brownian motion and the Matern made in Figure 3
+Fig3.zip
+  - comparison of fractional Brownian motion and the Matern made in Figure 3
 
-Click here for analysis code of numerical SPEM 5.2 model output to produce Figure 5
+Fig5.zip
+  - analysis code of numerical SPEM 5.2 model output to produce Figure 5
 
-Click here for analysis code of Drifter ID #44312 to produce Figures 6-10
+Fig6-10.zip
+  - analysis code of Drifter ID #44312 to produce Figures 6-10
