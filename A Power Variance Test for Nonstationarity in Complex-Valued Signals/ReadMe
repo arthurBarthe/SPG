@@ -1,8 +1,12 @@
+A Power Variance Test for Nonstationarity in Complex-Valued Signals
+
 by Thomas E. Bartlett, Adam M. Sykulski, Sofia C. Olhede, Jonathan M. Lilly and Jeffrey J. Early (2015) 
 
 email: thomas.bartlett.10@ucl.ac.uk with queries
 
 All code is in Matlab, and all downloads are zip files.
+
+Description of code:
 
 SPVNT.zip
   - code to perform a power variance test on any complex-valued signal
