@@ -1,0 +1,7 @@
+Exact Simulation of Noncircular or Improper Complex-Valued Stationary Gaussian Processes using Circulant Embedding
+
+by Adam M. Sykulski and Donald B. Percival (2016)
+
+email: a.sykulski@lancaster.ac.uk with queries
+
+Here we provide a MATLAB .m file named improper.m for simulating series from a complex-valued stationary Gaussian process with specified autocovariance and complementary covariance
