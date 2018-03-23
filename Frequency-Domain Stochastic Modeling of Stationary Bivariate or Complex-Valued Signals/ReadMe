@@ -1,0 +1,20 @@
+Frequency-Domain Stochastic Modeling of Stationary Bivariate or Complex-Valued Signals
+
+by Adam M. Sykulski, Sofia C. Olhede, Jonathan M. Lilly and Jeffrey J. Early (2017) 
+
+email: a.sykulski@lancaster.ac.uk with queries
+
+All code is in Matlab, and all downloads are zip files. Each zip file has a ReadMe with important info
+
+Description of code:
+
+Fig1Code.zip
+
+- provides time-frequency analysis of Drifter ID# 44000 from the Global Drifter Program
+- provides code to exactly reproduce Figure 1 in the paper
+
+Fig3-5Code.zip
+
+- provides 4-parameter Matern model and estimation procedure for the anisotropic flow example
+- provides code to exactly reproduce Figures 3-5 in the paper
+- includes technical description of the numerical model (in the ReadMe file)
