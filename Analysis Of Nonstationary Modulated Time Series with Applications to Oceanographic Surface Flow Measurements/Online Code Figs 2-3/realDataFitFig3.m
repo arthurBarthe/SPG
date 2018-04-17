@@ -8,8 +8,9 @@ load blurreddrifters.mat
 for drifter_id = 1:200
     drifter_id
     X = blurreddrifters.cv{drifter_id}; % Velocities time series
-    CF = -4*7.2921*10^(-5)*3600*sin(mean(blurreddrifters.lat{drifter_id})/90*(pi/2)); % average Coriolis frequency
-    phi_t = -4*7.2921*10^(-5)*3600*sin(blurreddrifters.lat{drifter_id}/90*(pi/2)); % Coriolis frequencies.
+    drifter_lats = blurreddrifters.lat{drifter_id};
+    CF = coriolis_frequency(mean(drifter_lats));
+    CF_t = coriolis_frequency(drifter_lats);
     LPCNT=0.8/6; % Fraction of negative frequencies included in fit (from 0 to 1)
     UPCNT=0.8/6; % Fraction of positive frequencies included in fit (from 0 to 1)
     if CF>0 % Only fit to one side (with the inertial oscillation)
@@ -33,20 +34,23 @@ for drifter_id = 1:200
     NF=floor((abs(MF-fmax))/3); % Number of frequencies we now analyze over
     xb(6)=quantile(SZ([MF-NF:MF-1 MF+1:MF+NF]).*(omega([MF-NF:MF-1 MF+1:MF+NF]))'.^2./(valMAX-SZ([MF-NF:MF-1 MF+1:MF+NF])),0.5); % solve simultaneous equations for xb(4) and xb(6), take median
     xb(4)=valMAX*xb(6); xb(4) = abs(xb(4))^0.5; xb(6) = abs(xb(6))^0.5; % square root of these to arrive at starting parameters
-    valmax = SZ(fmax); xb(2)=CF; % corresponding frequency peak in radians
+    valmax = SZ(fmax); xb(2) = CF; % corresponding frequency peak in radians
     xb(3)=quantile(SZ([fmax-NF:fmax-1 fmax+1:fmax+NF]).*(omega([fmax-NF:fmax-1 fmax+1:fmax+NF])-xb(2))'.^2./(valmax-SZ([fmax-NF:fmax-1 fmax+1:fmax+NF])),0.5); % solve simultaneous equations for xb(1) and xb(3), take median
     xb(1)=valmax*xb(3); xb(1) = abs(xb(1))^0.5; xb(3) = abs(xb(3))^0.5; % square root of these to arrive at starting parameters
-    %% LIKELIHOOD1----------------------------------------------
+    %% Parameter estimation.
     %%The stationary likelihood of Sykulski et al. (2016) JRSSc
-    minbound = [0  1  pi*sqrt(3)/(N*xb(3)) 0 0.5/xb(5) pi*sqrt(3)/(N*xb(6))]; % minimum parameter range
-    maxbound = [inf 1 inf inf 2.5/xb(5) inf]; % maximum parameter range
+    %Minimum and maximum parameter ranges
+    minbound = [0  1  pi*sqrt(3)/(N*xb(3)) 0 0.5/xb(5) pi*sqrt(3)/(N*xb(6))]; 
+    maxbound = [inf 1 inf inf 2.5/xb(5) inf]; 
     [x1b,fval1,exitflag1]=fminsearchbnd(@(x) maternOUmodel(x,xb,SZ',N,LB,UB,MF,ZEROF), ones(1,6),minbound,maxbound, options); 
     x1 = x1b .* xb;
     %%Our nonstationary likelihood
     xb2 = xb; % same starting values as for stationary method
-    minbound = [0  0  pi*sqrt(3)/(N*xb2(3)) 0 0.5/xb2(5) pi*sqrt(3)/(N*xb2(6))]; % same minimum parameter range
+    %Minimum and maximum parameter ranges. Notice the second parameter is
+    %the average shift fro
+    minbound = [0  0  pi*sqrt(3)/(N*xb2(3)) 0 0.5/xb2(5) pi*sqrt(3)/(N*xb2(6))];
     maxbound = [inf 0 inf inf 2.5/xb(5) inf]; % same maximum parameter range
-    [x2, fval2, exitflag2, time2, ker] = fitOUandMatern( SZ', phi_t, N, LB, UB, MF, ZEROF, xb2, minbound, maxbound, options);
+    [x2, fval2, exitflag2, time2, ker] = fitOUandMatern( SZ', CF_t, N, LB, UB, MF, ZEROF, xb2, minbound, maxbound, options);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     stat.ml(drifter_id)=fval1;
     nstat.ml(drifter_id)=fval2;

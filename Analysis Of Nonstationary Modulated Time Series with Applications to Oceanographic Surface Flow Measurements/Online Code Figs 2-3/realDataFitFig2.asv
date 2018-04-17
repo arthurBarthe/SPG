@@ -1,30 +1,28 @@
 %This script does the fit of the OU and Matern model to the GDP drifters.
 %Sampling step (time between two consecutive observations)
 delta = 2;
-%Optimization algorithm parameters
-options=optimset('GradObj','on','MaxFunEvals',100000,'MaxIter',10000, ...
-    'TolFun',1e-10,'TolX',1e-10,'Display','on'); 
+%Optimization parameters
+options=optimset('GradObj','on','MaxFunEvals',100000,'MaxIter',10000,'TolFun',1e-10,'TolX',1e-10,'Display','on'); % Fminsearch choices
 % Include zero-frequency? 1=yes, 0=no;
-ZEROF=1; 
+ZEROF=0; 
 % Figure sub-headings
-jj=1; 
-FFF = ['a','b','c','d']; 
+jj=1; FFF = ['a','b','c','d']; 
 %Loading the data
 load blurreddrifters.mat
 load drifterulysses.mat
 % The Figure size
 scrsz = get(0,'ScreenSize'); 
-Arthur2 = figure('Position',[1 1 scrsz(3)/2 scrsz(3)/2.6])
+Arthur2=figure('Position',[1 1 scrsz(3)/2 scrsz(3)/2.6])
 for drifter_id =  [85 123 149 201] 
     % these are the drifter IDs in the Figure example
     if drifter_id == 201
         %This drifter's velocity time series can be considered as
         %stationary.
-        % Time series of velocities
+        % Velocities time series
         X = drifterulysses.cv(1:852);
-        %Time series of latitudes used to compute Coriolis frequencies
+        %Time series of latitudes
         drifter_lats = drifterulysses.lat(1:852);
-        %"average" Coriolis frequency, in radians/hour   
+        % average Coriolis frequency, in radians/hour   
         CF = coriolis_frequency(mean(drifter_lats)); 
         % Coriolis frequencies, in radians/hour
         CF_t = coriolis_frequency((drifter_lats)); 
@@ -51,14 +49,10 @@ for drifter_id =  [85 123 149 201]
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% PRELIMINARIES
     N = length(X); 
-    %Fourier frequencies. Unit of omega depends on the unit of delta. For
-    %instance if delta is 2 hours, the Fourier frequencies returned are in
-    %radians/h.
     omega = Fourier_frequencies(N, delta);
     MF = floor(N/2)+1; 
-    %Indices of frequencies in the estimation range.
     LB = round((MF-1)*(1-LPCNT)+1); 
-    UB = round(MF+UPCNT*(N-MF)); 
+    UB = round(MF+UPCNT*(N-MF)); % Frequency indices in our estimation range
     SZ=(delta/N)*(abs(fft(X))).^2; 
     SZ=fftshift(SZ); % Power Spectrum
     %% INITIAL PARAMETERS (same as in Sykulski et. al (2016) JRSSc for stationary drifters)
@@ -97,13 +91,10 @@ for drifter_id =  [85 123 149 201]
     disp('Nonstationary likelihood method estimation...');
     %Same initialization for the optimization algorithm
     xb2 = xb;
-    %Same constraints, except for the second parameter which is set to
-    %zero. Indeed, for the non-stationary likelihood, the second parameter
-    %represents the average shift to the coriolis frequency. Here we assume
-    %no shift.
+    %Same constraints,
     minbound = [0  0  pi*sqrt(3)/(N*xb2(3)) 0 0.5/xb2(5) pi*sqrt(3)/(N*xb2(6))];
     maxbound = [inf 0 inf inf 2.5/xb(5) inf]; 
-    [x2, fval2, exitflag2, time2, ker] = fitOUandMatern( SZ', CF_t, delta, LB, UB, MF, ZEROF, xb2, minbound, maxbound, options);
+    [x2, fval2, exitflag2, time2, ker] = fitOUandMatern( SZ', CF_t, N, delta, LB, UB, MF, ZEROF, xb2, minbound, maxbound, options);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% DISPLAY SOME OUTPUT
     x1 = x1b .* xb;
@@ -124,14 +115,12 @@ for drifter_id =  [85 123 149 201]
     colour2 = [0.5 0.5 0.5];
     colour1 = [0.5 0.5 0.5];
     subplot(2,2,jj);
-    %Plot of the periodogram
     plot(omega,10*(log10(SZ)),'color', colour1); 
-    xlim([-pi pi]);
-    %stationary fit
+    xlim([-pi pi]); % figure of periodogram
     acv=maternacvs(x1(4:6),N,delta)+complexouacvs(x1(1:3),N,delta); % predicted autocovariance sequence
     ESF2=2*fft(acv.*(1-(0:N-1)/N))-acv(1); 
     ESF3=abs(real(fftshift(ESF2))); % fft of acvs with triangle kernel to find expected blurred spectrum
-    %non-stationary fit
+    %Non-stationary fit
     ESF_=S_(ker, x2, delta);
     hold on; plot(omega,10*log10(ESF3),'color',colour2,'linestyle','--','linewidth',2); % stationary expected periodogram
     hold on; plot(omega,10*log10(ESF_),'color',colour3,'linestyle','--','linewidth',2); % nonstationary expected periodogram

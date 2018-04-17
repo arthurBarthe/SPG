@@ -1,4 +1,4 @@
-function [ ESF ] = S_(ker, params )
+function [ ESF ] = S_(ker, params, delta )
 %This function returns the theoretical expected periodogram for the given
 %parameters of the OU and Matérn, and the kernel passed to it.
 %Parameters:
@@ -12,8 +12,8 @@ function [ ESF ] = S_(ker, params )
 %ESF [1xN]: the expected periodogram at Fourier frequencies (from -pi to
 %pi).
 N = length(ker);
-acv = maternacvs(params(4:6),N,1) .* (1-(0:N-1)/N);
-acv = acv + complexouacvs(params,N,1) .* ker;
+acv = maternacvs(params(4:6),N,delta) .* (1-(0:N-1)/N);
+acv = acv + complexouacvs(params(1:3), N, delta) .* ker;
 ESF2=2*fft(acv)-acv(1); ESF=abs(real(fftshift(ESF2)));
 end
 
