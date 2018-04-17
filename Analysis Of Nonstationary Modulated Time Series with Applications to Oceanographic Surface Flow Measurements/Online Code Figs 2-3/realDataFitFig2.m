@@ -1,3 +1,4 @@
+clear all; close all;
 %This script does the fit of the OU and Matern model to the GDP drifters.
 %Sampling step (time between two consecutive observations)
 delta = 2;
@@ -28,16 +29,17 @@ for drifter_id =  [85 123 149 201]
         CF = coriolis_frequency(mean(drifter_lats)); 
         % Coriolis frequencies, in radians/hour
         CF_t = coriolis_frequency((drifter_lats)); 
-        % Fraction of negative/positive frequencies included in fit (from 0 to 1)
-        LPCNT=1.5/6; 
-        UPCNT=1.5/6; 
+        %Minimal and maximal frequencies used for the fit. In cycles per
+        %day here so we wil have to convert.
+        LPCNT=-1.5; 
+        UPCNT=1.5; 
     else
         X = blurreddrifters.cv{drifter_id};                 
         drifter_lats = blurreddrifters.lat{drifter_id};
         CF = coriolis_frequency(mean(drifter_lats));
         CF_t = coriolis_frequency(drifter_lats);
-        LPCNT=0.8/6; 
-        UPCNT=0.8/6; 
+        LPCNT = -0.8; 
+        UPCNT = 0.8; 
     end
     % Only fit to one side (with the inertial oscillation)
     if CF>0 
@@ -56,9 +58,10 @@ for drifter_id =  [85 123 149 201]
     %radians/h.
     omega = Fourier_frequencies(N, delta);
     MF = floor(N/2)+1; 
-    %Indices of frequencies in the estimation range.
-    LB = round((MF-1)*(1-LPCNT)+1); 
-    UB = round(MF+UPCNT*(N-MF)); 
+    %Indices of frequencies in the estimation range. First we convert to
+    %radians per hour.
+    LB = frequenciesToIndices(LPCNT * 2 * pi / 24, omega);
+    UB = frequenciesToIndices(UPCNT * 2 * pi / 24, omega);
     SZ=(delta/N)*(abs(fft(X))).^2; 
     SZ=fftshift(SZ); % Power Spectrum
     %% INITIAL PARAMETERS (same as in Sykulski et. al (2016) JRSSc for stationary drifters)
