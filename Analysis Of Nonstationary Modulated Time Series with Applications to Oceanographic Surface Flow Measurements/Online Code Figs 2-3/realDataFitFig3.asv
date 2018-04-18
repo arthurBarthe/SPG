@@ -82,11 +82,9 @@ for drifter_id = 1:200
     %% Parameter estimation.
     %%The stationary likelihood of Sykulski et al. (2016) JRSSc
     %Minimum and maximum parameter ranges
-    minbound = [0  1  pi*sqrt(3)/(N*xb(3)) 0 0.5/xb(5)...
-        pi*sqrt(3)/(N*xb(6))]; 
-    maxbound = [inf 1 inf inf 2.5 / xb(5) inf]; 
-    [x1b, fval1, exitflag1]=fminsearchbnd(@(x) maternOUmodel(x,xb,SZ',N, ...
-        LB,UB,MF,ZEROF, delta), ones(1,6),minbound,maxbound, options); 
+    minbound = [0  1  pi*sqrt(3)/(N*xb(3)) 0 0.5/xb(5) pi*sqrt(3)/(N*xb(6))]; 
+    maxbound = [inf 1 inf inf 2.5/xb(5) inf]; 
+    [x1b,fval1,exitflag1]=fminsearchbnd(@(x) maternOUmodel(x,xb,SZ',N,LB,UB,MF,ZEROF, delta), ones(1,6),minbound,maxbound, options); 
     x1 = x1b .* xb;
     %%Our nonstationary likelihood
     %Same initialization for the optimization algorithm
@@ -95,19 +93,16 @@ for drifter_id = 1:200
     %zero. Indeed, for the non-stationary likelihood, the second parameter
     %represents the average shift to the coriolis frequency. Here we assume
     %no shift.
-    minbound = [0  0  pi*sqrt(3)/(N*xb2(3)) 0 0.5/xb2(5) ...
-        pi*sqrt(3)/(N*xb2(6))];
-    maxbound = [inf 0 inf inf 2.5/xb(5) inf]; 
-    [x2, fval2, exitflag2, time2, ker] = fitOUandMatern( SZ', CF_t, ...
-        delta, LB, UB, MF, ZEROF, xb2, minbound, maxbound, options);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    stat.ml(drifter_id) = fval1;
-    nstat.ml(drifter_id) = fval2;
-    stat.param(drifter_id, :) = x1;
-    nstat.param(drifter_id, :) = x2;
+    minbound = [0  0  pi*sqrt(3)/(N*xb2(3)) 0 0.5/xb2(5) pi*sqrt(3)/(N*xb2(6))];
+    maxbound = [inf 0 inf inf 2.5/xb(5) inf]; % same maximum parameter range
+    [x2, fval2, exitflag2, time2, ker] = fitOUandMatern( SZ', CF_t, delta, LB, UB, MF, ZEROF, xb2, minbound, maxbound, options);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    stat.ml(drifter_id)=fval1;
+    nstat.ml(drifter_id)=fval2;
+    stat.param(drifter_id,:)=x1;
+    nstat.param(drifter_id,:)=x2;
 end
-%Update the progressbar and close it
-waitbar(1, progressBar, 'Done... Preparing figures...');
+waitbar(1, progressBar, 'Done');
 pause(2);
 close(progressBar);
 %% FIGURE 3 IN PAPER
@@ -128,16 +123,12 @@ xlabel(['1/\lambda (days, stationary fit, median = ' ...
     num2str(median_stationary) ')']);
 ylabel(['1/\lambda (days, non-stationary fit, median = '...
     num2str(median_nonstationary) ' )']); 
-title('(a)'); 
-box on
-hold on;
-line([0 10],[0 10]);
-%Second subplot, contains the histogram of the differences in the
-%pseudo-likelihoods of both methods for each velocity time series.
+title('(a)'); box on
+hold on; line([0 10],[0 10]);
 subplot(1,2,2); 
-histogram(stat.ml-nstat.ml, 50);
-title('(b)');
-ylabel('frequency'); 
-xlabel('$l_S(\hat{\theta}_S)-l_{NS}(\hat{\theta}_{NS})$', 'Interpreter', 'Latex'); 
-%Exporting for the paper
-exportfig(Arthur3, 'Arthur3.eps', 'color', 'cmyk','Fontmode','fixed','FontSize', 12); 
+histogram(stat.ml-nstat.ml,50); title('(b)'); ylabel('frequency'); 
+xlabel('$l_S(\hat{\theta}_S)-l_{NS}(\hat{\theta}_{NS})$', 'Interpreter', 'Latex'); % Histogram of likelihood differences
+exportfig(Arthur3, 'Arthur3.eps', 'color', 'cmyk','Fontmode','fixed','FontSize', 12); % For exporting fig into paper
+%%
+disp(['Median damping timescale (stationary model): ', num2str(median_stationary)]);
+disp(['Median damping timescale (nonstationary model): ', num2str(median_nonstationary)]);

@@ -1,4 +1,6 @@
-function [ params, fval, exit_flag, CPUtime, ker ] = fitOUandMatern( SZ, corfreqs, delta, LB, UB, MF, ZEROF, start, minBound, maxBound, options)
+function [ params, fval, exit_flag, CPUtime, ker ] = ...
+    fitOUandMatern( SZ, corfreqs, delta, LB, UB, MF, ZEROF, start,...
+    minBound, maxBound, options)
 %This function fits the OU and Matern model using the nonstationary
 %likelihood.
 %Parameters:
@@ -23,7 +25,7 @@ ker = kernel(coriolis_freqs2modulation_sequence(corfreqs, delta));
 
 %We minimize the -likelihood
 [xr, fval, exit_flag] = fminsearchbnd(@(x) lkh_(x .* start, SZ, ker, ...
-    delta,LB,UB,MF,ZEROF), ones(1,6), minBound, maxBound,options);
+    delta,LB,UB,MF,ZEROF), ones(1,6), minBound, maxBound, options);
 
 %We obtain the estimated params by multiplying the starting parameters by
 %the estimated factor.

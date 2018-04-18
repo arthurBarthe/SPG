@@ -17,15 +17,17 @@ switch nargin
     case 1
         unit = 'r-h';
 end
-freq_r_h = -2*7.2921*10^(-5)*3600*sin(latitude / 180 * pi);
+latitude_radians = 
+freq_r_h = -2*7.2921*10^(-5)*3600*sin(latitude_ra);
 switch unit
     case 'r-h'
         freqs = freq_r_h;
     case 'r-d'
         freqs = 24 * freq_r_h;
     case 'c-d'
-        freqs = freq_r_h * 24 / 
-        
-
+        freqs = freq_r_h * 24 / 2 / pi;
+    case 'c-h'
+        freqs = freq_r_h / 2 / pi;
+end
 end
 

@@ -31,15 +31,15 @@ for drifter_id =  [85 123 149 201]
         CF_t = coriolis_frequency((drifter_lats)); 
         %Minimal and maximal frequencies used for the fit. In cycles per
         %day here so we wil have to convert.
-        LPCNT=-1.5; 
-        UPCNT=1.5; 
+        LPCNT = convertFrequency(-1.5, 'cycles per day', 'radians per hour'); 
+        UPCNT = convertFrequency(1.5, 'cycles per day', 'radians per hour'); 
     else
         X = blurreddrifters.cv{drifter_id};                 
         drifter_lats = blurreddrifters.lat{drifter_id};
         CF = coriolis_frequency(mean(drifter_lats));
         CF_t = coriolis_frequency(drifter_lats);
-        LPCNT = -0.8; 
-        UPCNT = 0.8; 
+        LPCNT = convertFrequency(-0.8, 'cycles per day', 'radians per hour'); 
+        UPCNT = convertFrequency(0.8, 'cycles per day', 'radians per hour'); 
     end
     % Only fit to one side (with the inertial oscillation)
     if CF>0 
@@ -60,9 +60,9 @@ for drifter_id =  [85 123 149 201]
     MF = floor(N/2)+1; 
     %Indices of frequencies in the estimation range. First we convert to
     %radians per hour.
-    LB = frequenciesToIndices(LPCNT * 2 * pi / 24, omega);
-    UB = frequenciesToIndices(UPCNT * 2 * pi / 24, omega);
-    SZ=(delta/N)*(abs(fft(X))).^2; 
+    LB = frequenciesToIndices(LPCNT, omega);
+    UB = frequenciesToIndices(UPCNT, omega);
+    SZ=1/N/delta*(abs(fft(X))).^2; 
     SZ=fftshift(SZ); % Power Spectrum
     %% INITIAL PARAMETERS (same as in Sykulski et. al (2016) JRSSc for stationary drifters)
     xb=zeros(1,6);
@@ -118,10 +118,10 @@ for drifter_id =  [85 123 149 201]
     disp(['CPU time: ', num2str(time2)]);
     %% FIGURE 2 IN PAPER
     %Convert frequencies to cycles per day for the figure
-    omega = omega * 24 / (2 * pi);
-    CF = CF * 24 / (2 * pi);
-    CFmin = CFmin * 24 / (2 * pi);
-    CFmax = CFmax * 24 / (2 * pi);
+    omega = convertFrequency(omega, 'radians per hour', 'cycles per day');
+    CF = convertFrequency(CF, 'radians per hour', 'cycles per day');
+    CFmin = convertFrequency(CFmin, 'radians per hour', 'cycles per day');
+    CFmax = convertFrequency(CFmax, 'radians per hour', 'cycles per day');
     %Colours
     colour3 = [0 0 0];
     colour2 = [0.5 0.5 0.5];

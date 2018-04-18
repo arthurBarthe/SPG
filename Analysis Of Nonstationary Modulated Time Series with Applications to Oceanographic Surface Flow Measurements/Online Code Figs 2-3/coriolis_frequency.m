@@ -17,7 +17,8 @@ switch nargin
     case 1
         unit = 'r-h';
 end
-freq_r_h = -2*7.2921*10^(-5)*3600*sin(latitude / 180 * pi);
+latitude_radians = latitude / 180 * pi;
+freq_r_h = -2*7.2921*10^(-5)*3600*sin(latitude_radians);
 switch unit
     case 'r-h'
         freqs = freq_r_h;
